@@ -1,0 +1,52 @@
+CYBERSECURITY BASICS — DEMO KNOWLEDGE DOCUMENT
+Purpose: Test the AI Knowledge Assistant's document upload, indexing, retrieval, and question-answering features.
+
+1. WHAT IS PHISHING?
+Phishing is a social engineering technique in which an attacker impersonates a trusted person or organization to trick someone into revealing sensitive information, clicking a malicious link, or opening a harmful attachment.
+Common warning signs include an unexpected message, urgent language, mismatched sender addresses, suspicious links, requests for passwords, and unexpected attachments.
+A safe response is to avoid clicking links, verify the request through a separate trusted channel, and report the message to the organization's security team.
+
+2. WHAT IS MULTI-FACTOR AUTHENTICATION?
+Multi-factor authentication (MFA) requires a user to prove their identity using at least two different types of evidence.
+The common factor categories are something you know (such as a password), something you have (such as a security key), and something you are (such as a fingerprint).
+MFA can reduce the risk of account compromise when a password is stolen. Phishing-resistant methods, such as FIDO2 security keys or passkeys, provide stronger protection than codes that users manually enter.
+
+3. WHAT IS SQL INJECTION?
+SQL injection is a vulnerability that occurs when an application places untrusted input into a database query in an unsafe way.
+An attacker may be able to change the meaning of the query, potentially reading or modifying data or bypassing authentication.
+A primary defense is to use parameterized queries (prepared statements) so that user input is treated as data rather than executable SQL. Applications should also use least-privilege database accounts and avoid exposing detailed database errors.
+
+4. WHAT IS CROSS-SITE SCRIPTING?
+Cross-site scripting (XSS) is a web security vulnerability that allows attacker-controlled script to execute in another user's browser in the context of a vulnerable website.
+Common categories include stored XSS, reflected XSS, and DOM-based XSS.
+Defenses include context-aware output encoding, safe DOM APIs, careful handling of untrusted HTML, and a Content Security Policy as an additional layer of protection.
+
+5. WHAT IS THE PRINCIPLE OF LEAST PRIVILEGE?
+The principle of least privilege means giving each user, process, or service only the permissions needed to perform its assigned tasks, and no more.
+For example, an application that only needs to read records should not use a database account with permission to delete the entire database.
+Least privilege limits the damage that can result from mistakes, compromised accounts, or malicious activity.
+
+6. WHAT IS A SECURITY INFORMATION AND EVENT MANAGEMENT SYSTEM?
+A security information and event management (SIEM) system collects and analyzes security-related logs and events from sources such as servers, endpoints, firewalls, and applications.
+A SIEM can correlate events, apply detection rules, generate alerts, and help analysts investigate suspicious activity.
+A SIEM alert is a signal that requires investigation; it is not, by itself, proof that an incident has occurred.
+
+7. WHAT IS THE DIFFERENCE BETWEEN AUTHENTICATION AND AUTHORIZATION?
+Authentication verifies who a user or service is.
+Authorization determines what that authenticated identity is allowed to access or do.
+For example, signing in with a password is an authentication action. Being allowed to view a particular report is an authorization decision.
+
+8. INCIDENT RESPONSE — BASIC STEPS
+A common incident-response lifecycle includes preparation; detection and analysis; containment; eradication; recovery; and post-incident lessons learned.
+The exact actions depend on the incident and the organization's procedures.
+Analysts should preserve relevant evidence, document actions, and follow their organization's escalation and communication processes.
+
+TEST QUESTIONS
+1. What is phishing, and name two warning signs.
+2. How does MFA help protect an account?
+3. What is the main defense against SQL injection?
+4. What are the three common categories of XSS?
+5. Explain the principle of least privilege with the database example.
+6. What does a SIEM do, and does an alert prove an incident occurred?
+7. What is the difference between authentication and authorization?
+8. List the basic stages of incident response.

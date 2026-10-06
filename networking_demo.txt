@@ -1,0 +1,12 @@
+NETWORKING BASICS
+
+TCP is a connection-oriented protocol that provides
+reliable, ordered delivery of data.
+
+UDP is a connectionless protocol that does not
+guarantee delivery or ordering.
+
+DNS translates domain names into IP addresses.
+
+HTTPS uses TLS to protect communication between
+a client and a server.
