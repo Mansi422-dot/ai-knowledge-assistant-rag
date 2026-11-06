@@ -12,16 +12,13 @@ The application is designed to answer from the documents in its local knowledge 
 ### Knowledge Base
 ![Knowledge Base](screenshots/knowledge-base.png)
 
-### Retrieved sources
-![Retrieved source passages](screenshots/retrieved-sources.png)
+### Upload errors
+![Upload errors](screenshots/upload-errors.png)
 
 ### Related question
 ![Related question](screenshots/related-question.png)
 
-### Upload errors
-![Upload errors](screenshots/upload-errors.png)
-
-### Irrelevant question
+### Unrelated question
 ![Irrelevant question](screenshots/unrelated-question.png)
 
 ## Features
