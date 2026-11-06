@@ -9,11 +9,14 @@ The application is designed to answer from the documents in its local knowledge 
 ### Main interface
 ![Main interface](screenshots/main-interface.png)
 
-### Grounded answer — phishing question
-![Grounded answer about phishing](screenshots/grounded-answer-phishing.png)
+### Knowledge Base 
+![Retrieved source passages for phishing](screenshots/knowledge-base.png)
 
 ### Retrieved sources — phishing question
-![Retrieved source passages for phishing](screenshots/retrieved-sources-phishing.png)
+![Retrieved source passages for phishing](screenshots/retrieved-sources.png)
+
+### Irrelevant Question
+![Retrieved source passages for phishing](screenshots/unrelated-question.png)
 
 ## Features
 
