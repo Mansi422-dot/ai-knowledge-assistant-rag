@@ -249,7 +249,7 @@ cd AI_Knowledge_Assistant
 
 ```bash
 python3 -m venv venv
-source venv/bin/activate
+source .venv-rag/bin/activate
 ```
 
 #### Windows
@@ -302,8 +302,8 @@ sudo systemctl start ollama
 From the project directory:
 
 ```bash
-source venv/bin/activate
-python -m uvicorn app.main:app --reload
+source .venv-rag/bin/activate
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
 The backend runs at:
@@ -317,7 +317,7 @@ http://localhost:8000
 Open another terminal in the project directory:
 
 ```bash
-python3 -m http.server 5173
+python3 -m http.server 5173 --bind 127.0.0.1
 ```
 
 Then open:
@@ -471,7 +471,7 @@ Run the automated tests:
 pytest
 ```
 
-The project has also been manually tested for:
+The project should be manually verified locally for:
 
 - Document upload
 - Document indexing
@@ -566,3 +566,12 @@ Potential future improvements include:
 ## License
 
 This project is intended for educational and portfolio purposes.
+
+
+## Important operational notes
+
+- Keep this application bound to `127.0.0.1` for local use. It has no authentication or multi-user isolation.
+- The JSON index is designed for a single local application process. Do not run multiple Uvicorn workers against the same data directory.
+- Back up `data/index.json` and the associated uploaded files together before changing embedding models or manually editing the index.
+- The `grounded` response field means the local LLM generated an answer using retrieved excerpts. It is not a guarantee that the answer is factually correct.
+- The distributable source package intentionally does not include your local `data/index.json`, uploaded documents, `.env`, or virtual environment. Preserve those in your existing project directory when replacing source files.

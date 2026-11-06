@@ -1,7 +1,45 @@
+# Virtual environments
 .venv/
+.venv-rag/
+venv/
+env/
+
+# Python caches and test artifacts
 __pycache__/
-.pytest_cache/
-.env
 *.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local secrets
+.env
+.env.*
+!.env.example
+
+# Runtime document data and indexes
 data/*
 !data/.gitkeep
+
+# Temporary upload/index files
+.upload-*
+.delete-*
+.index-*.tmp
+
+# Editor / OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local backups and temporary documents
+data-backup-before-security-fixes/
+backup/
+backups/
+*.bak
+*.backup
+
+# Temporary integration test files
+ai_ka_smoke_test.txt
+ai_ka_injection_test.txt
+rag_security_test.txt
+rag_injection_test.txt
