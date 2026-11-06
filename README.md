@@ -1,577 +1,222 @@
-# AI Knowledge Assistant with RAG
+# AI Knowledge Assistant (RAG)
 
-A local AI-powered document question-answering assistant built using **Retrieval-Augmented Generation (RAG)**.
+A local Retrieval-Augmented Generation (RAG) application that lets users upload documents, ask questions about their contents, and receive answers supported by retrieved passages.
 
-The application allows users to upload documents, extract and chunk their content, generate semantic embeddings, retrieve relevant passages, and generate grounded answers using a locally hosted **Ollama LLM**.
-
-The assistant is designed to answer questions using only information contained in the uploaded documents. When relevant information cannot be found, it refuses to answer instead of inventing information.
-
-> **Local-first:** The current version uses Ollama and the `qwen2.5:3b` model locally. No paid LLM API is required.
+The application is designed to answer from the documents in its local knowledge base—not from unrestricted internet search. When relevant information is unavailable, it should say so instead of inventing an answer.
 
 ## Screenshots
 
-### Main Interface
+### Main interface
+![Main interface](screenshots/main-interface.png)
 
-![Main Interface](screenshots/main-interface.png)
+### Grounded answer — phishing question
+![Grounded answer about phishing](screenshots/grounded-answer-phishing.png)
 
-### Knowledge Base
-
-![Knowledge Base](screenshots/knowledge-base.png)
-
-### Grounded Answer
-
-![Grounded Answer](screenshots/grounded-answer.png)
-
-### Retrieved Sources
-
-![Retrieved Sources](screenshots/retrieved-sources.png)
-
-### Unrelated Question Rejection
-
-![Unrelated Question](screenshots/unrelated-question.png)
+### Retrieved sources — phishing question
+![Retrieved source passages for phishing](screenshots/retrieved-sources-phishing.png)
 
 ## Features
 
-- Upload PDF, DOCX, TXT, and Markdown documents
-- Automatic document parsing and text extraction
-- Text chunking with overlapping context
-- Local semantic embeddings using Sentence Transformers
-- Cosine-similarity based semantic search
-- Configurable similarity threshold for relevance filtering
-- Top-k document retrieval
-- Grounded answer generation using a local Ollama LLM
-- Source citations linked to retrieved document chunks
-- Relevance scores for retrieved passages
-- Multiple-document question answering
-- Persistent local document index
-- Upload, list, and delete indexed documents
-- Rejects unrelated questions when relevant document context is unavailable
-- FastAPI backend with interactive API documentation
-- Browser-based frontend
-- No paid LLM API required
+- Upload text-based PDF, DOCX, TXT, and Markdown documents.
+- Extract and clean document text.
+- Split content into overlapping chunks.
+- Generate embeddings with Sentence Transformers.
+- Retrieve relevant passages using vector similarity.
+- Generate context-assisted answers using a locally hosted Ollama model.
+- Display retrieved source passages and relevance scores.
+- Return an abstention response when the knowledge base does not contain relevant information.
+- Delete indexed documents and refresh the knowledge-base view.
+- Validate uploads and API inputs, and restrict the local frontend/backend configuration.
 
-## How It Works
+## Technology stack
 
-The application follows a Retrieval-Augmented Generation pipeline:
+- **Frontend:** HTML, CSS, JavaScript
+- **Backend:** Python, FastAPI
+- **Embeddings:** Sentence Transformers (`all-MiniLM-L6-v2`)
+- **Vector storage:** Local NumPy-based index
+- **LLM runtime:** Ollama
+- **Default chat model:** `qwen2.5:3b`
 
-```text
-                ┌──────────────────┐
-                │  Upload Document │
-                └────────┬─────────┘
-                         │
-                         ▼
-                ┌──────────────────┐
-                │ Parse & Clean    │
-                └────────┬─────────┘
-                         │
-                         ▼
-                ┌──────────────────┐
-                │ Text Chunking    │
-                │ + Overlap        │
-                └────────┬─────────┘
-                         │
-                         ▼
-                ┌──────────────────┐
-                │ Generate         │
-                │ Embeddings       │
-                └────────┬─────────┘
-                         │
-                         ▼
-                ┌──────────────────┐
-                │ Persistent       │
-                │ Vector Index     │
-                └──────────────────┘
+## Requirements
 
+- Python 3.10 or newer (use a Python version supported by the installed PyTorch and Sentence Transformers packages).
+- [Ollama](https://ollama.com/) installed and running.
+- Git.
+- Internet access for the initial Python package and model downloads. After dependencies and models are downloaded, inference can run locally.
 
-User Question
-      │
-      ▼
-┌──────────────────┐
-│ Generate Query   │
-│ Embedding        │
-└────────┬─────────┘
-         │
-         ▼
-┌──────────────────┐
-│ Semantic Search  │
-│ + Similarity     │
-│ Threshold        │
-└────────┬─────────┘
-         │
-         ▼
-┌──────────────────┐
-│ Relevant         │
-│ Document Chunks  │
-└────────┬─────────┘
-         │
-         ▼
-┌──────────────────┐
-│ Local Ollama LLM │
-│ Qwen2.5 3B       │
-└────────┬─────────┘
-         │
-         ▼
-┌──────────────────┐
-│ Grounded Answer  │
-│ + Sources        │
-└──────────────────┘
+## Setup
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Mansi422-dot/ai-knowledge-assistant-rag.git
+cd ai-knowledge-assistant-rag
 ```
 
-## Technology Stack
+### 2. Create and activate a virtual environment
 
-### Backend
+Linux / WSL / macOS:
 
-- Python
-- FastAPI
-- Uvicorn
-- Pydantic Settings
-- HTTPX
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
 
-### RAG / AI
+Windows PowerShell:
 
-- Sentence Transformers
-- `sentence-transformers/all-MiniLM-L6-v2` embeddings
-- Ollama
-- `qwen2.5:3b`
-- Cosine similarity
-- Persistent JSON-based vector index
+```powershell
+py -m venv .venv
+.venv\\Scripts\\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
 
-### Document Processing
+### 3. Configure environment variables
 
-- PyPDF
-- `python-docx`
-- TXT
-- Markdown
+Copy the example configuration:
 
-### Frontend
+```bash
+cp .env.example .env
+```
 
-- HTML
-- CSS
-- JavaScript
+Review `.env` and adjust values if needed. Do not commit `.env`; it may contain local configuration.
 
-### Testing
+### 4. Start Ollama and download the model
 
-- Pytest
+Ensure the Ollama service is running, then:
 
-## Project Structure
+```bash
+ollama pull qwen2.5:3b
+ollama list
+```
+
+The default configuration expects Ollama at `http://localhost:11434`.
+
+### 5. Start the backend
+
+From the repository root, with the virtual environment activated:
+
+```bash
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+
+Backend API: `http://127.0.0.1:8000`
+
+Health endpoint: `http://127.0.0.1:8000/health/live`
+
+### 6. Start the frontend
+
+Open a second terminal:
+
+```bash
+cd ai-knowledge-assistant-rag
+python3 -m http.server 5173 --bind 127.0.0.1 --directory frontend
+```
+
+Open `http://127.0.0.1:5173/` in your browser.
+
+The frontend is served from the dedicated `frontend/` directory rather than the repository root.
+
+## Configuration
+
+The example `.env.example` contains the following settings:
+
+| Variable | Purpose |
+|---|---|
+| `LLM_MODEL` | Ollama chat model name |
+| `LLM_BASE_URL` | Ollama service URL |
+| `EMBEDDING_MODEL` | Sentence Transformers embedding model |
+| `DATA_DIR` | Local directory for the index and uploaded documents |
+| `MAX_UPLOAD_MB` | Maximum upload size in MB |
+| `CHUNK_SIZE` | Target chunk size |
+| `CHUNK_OVERLAP` | Overlap between adjacent chunks |
+| `TOP_K` | Maximum number of retrieved passages |
+| `SIMILARITY_THRESHOLD` | Minimum similarity score for retrieval |
+
+Use `.env.example` as the source of truth for the actual default values.
+
+## How the RAG pipeline works
+
+1. **Parse and clean:** Extract text from an uploaded document.
+2. **Chunk with overlap:** Split the text into smaller passages while retaining context between chunks.
+3. **Generate embeddings:** Convert each passage into a numerical vector.
+4. **Retrieve top matches:** Compare the question embedding with indexed passage embeddings.
+5. **Generate an answer:** Send the question and retrieved context to the local language model, then display the answer with source references.
+
+## Running tests
+
+Activate the project virtual environment, then run:
+
+```bash
+python -m pip check
+python -m compileall -q app tests
+python -m pytest -q
+```
+
+## API overview
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `GET` | `/health/live` | Liveness check |
+| `GET` | `/documents` | List indexed documents |
+| `POST` | `/documents` | Upload and index a document |
+| `DELETE` | `/documents/{filename}` | Delete an indexed document |
+| `POST` | `/ask` | Ask a question against the knowledge base |
+
+For the exact request and response schemas, inspect the FastAPI routes and Pydantic schemas in `app/`.
+
+## Repository structure
 
 ```text
-AI_Knowledge_Assistant/
-│
+ai-knowledge-assistant-rag/
 ├── app/
-│   ├── __init__.py
 │   ├── config.py
 │   ├── documents.py
 │   ├── llm.py
 │   ├── main.py
 │   ├── schemas.py
 │   └── vector_store.py
-│
 ├── data/
-│   └── .gitkeep
-│
-├── tests/
-│   └── test_documents.py
-│
+├── frontend/
+│   └── index.html
 ├── screenshots/
 │   ├── main-interface.png
-│   ├── knowledge-base.png
-│   ├── grounded-answer.png
-│   ├── retrieved-sources.png
-│   └── unrelated-question.png
-│
-├── web.html
-├── requirements.txt
+│   ├── grounded-answer-phishing.png
+│   └── retrieved-sources-phishing.png
+├── tests/
+│   ├── test_api.py
+│   ├── test_config.py
+│   ├── test_documents.py
+│   ├── test_llm.py
+│   ├── test_schemas.py
+│   └── test_vector_store.py
 ├── .env.example
 ├── .gitignore
-└── README.md
+├── README.md
+├── requirements.txt
+└── web.html
 ```
 
-The `data/` directory is used for the locally generated document index and uploaded documents.
-
-Generated data is excluded from Git using `.gitignore`.
-
-## Requirements
-
-- Python 3.10+
-- Ollama
-- Qwen2.5 3B model
-- Internet connection during the first embedding-model download
-
-The application itself does not require a paid LLM API.
-
-## Ollama Setup
-
-Install Ollama on your system and download the model:
-
-```bash
-ollama pull qwen2.5:3b
-```
-
-Check that the model is available:
-
-```bash
-ollama list
-```
-
-Make sure Ollama is running before using the question-answering functionality.
-
-On systems using the Ollama service:
-
-```bash
-sudo systemctl start ollama
-```
-
-Check its status:
-
-```bash
-sudo systemctl status ollama
-```
-
-The application communicates with Ollama through:
-
-```text
-http://localhost:11434
-```
-
-## Installation
-
-Clone the repository:
-
-```bash
-git clone <YOUR_GITHUB_REPOSITORY_URL>
-cd AI_Knowledge_Assistant
-```
-
-### Create a virtual environment
-
-#### Linux / macOS / WSL
-
-```bash
-python3 -m venv venv
-source .venv-rag/bin/activate
-```
-
-#### Windows
-
-```powershell
-python -m venv venv
-venv\Scripts\Activate.ps1
-```
-
-Install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-Create the environment file if needed:
-
-#### Linux / macOS / WSL
-
-```bash
-cp .env.example .env
-```
-
-#### Windows PowerShell
-
-```powershell
-Copy-Item .env.example .env
-```
-
-No paid LLM API key is required.
-
-## Running the Application
-
-### 1. Start Ollama
-
-Make sure Ollama is running:
-
-```bash
-ollama list
-```
-
-If necessary:
-
-```bash
-sudo systemctl start ollama
-```
-
-### 2. Start the FastAPI backend
-
-From the project directory:
-
-```bash
-source .venv-rag/bin/activate
-python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
-```
-
-The backend runs at:
-
-```text
-http://localhost:8000
-```
-
-### 3. Start the frontend
-
-Open another terminal in the project directory:
-
-```bash
-python3 -m http.server 5173 --bind 127.0.0.1
-```
-
-Then open:
-
-```text
-http://localhost:5173/web.html
-```
-
-## Using the Assistant
-
-### Step 1 — Upload a document
-
-Upload a supported:
-
-- PDF
-- DOCX
-- TXT
-- Markdown
-
-The document is parsed, split into chunks, embedded, and added to the local index.
-
-### Step 2 — Ask a question
-
-Enter a question about the uploaded documents.
-
-For example:
-
-```text
-What is phishing and what are its warning signs?
-```
-
-The application retrieves the most relevant document passages and sends them to the local Ollama model.
-
-### Step 3 — Review the answer
-
-The assistant displays:
-
-- Generated answer
-- Retrieved source documents
-- Chunk numbers
-- Relevance scores
-- Source excerpts
-
-The model is instructed to answer only from the retrieved document context.
-
-## Relevance Filtering
-
-The application uses a similarity threshold to reduce irrelevant retrievals.
-
-Current configuration:
-
-```python
-top_k = 4
-similarity_threshold = 0.25
-```
-
-Questions that do not produce sufficiently relevant document matches are rejected rather than answered from unrelated context.
-
-For example, if the uploaded documents contain cybersecurity information and the user asks:
-
-```text
-What is the capital of France?
-```
-
-the assistant should respond that it could not find the answer in the uploaded documents.
-
-## Local AI Architecture
-
-The application uses two local AI components.
-
-### Embedding Model
-
-```text
-sentence-transformers/all-MiniLM-L6-v2
-```
-
-This converts document chunks and user questions into numerical vector representations.
-
-### Language Model
-
-```text
-qwen2.5:3b
-```
-
-The model runs locally through Ollama.
-
-The application sends the retrieved document context to Ollama and asks it to generate an answer grounded in that context.
-
-## API Endpoints
-
-### Health Check
-
-```http
-GET /health
-```
-
-Returns the application and index status.
-
-### Upload Document
-
-```http
-POST /documents
-```
-
-Accepts a multipart file upload.
-
-### List Documents
-
-```http
-GET /documents
-```
-
-Returns the currently indexed documents.
-
-### Delete Document
-
-```http
-DELETE /documents/{filename}
-```
-
-Removes a document and its associated chunks.
-
-### Ask a Question
-
-```http
-POST /ask
-```
-
-Example request:
-
-```json
-{
-  "question": "What is phishing?",
-  "top_k": 4
-}
-```
-
-### Interactive API Documentation
-
-FastAPI provides interactive API documentation at:
-
-```text
-http://localhost:8000/docs
-```
-
-## Testing
-
-Run the automated tests:
-
-```bash
-pytest
-```
-
-The project should be manually verified locally for:
-
-- Document upload
-- Document indexing
-- Semantic retrieval
-- Grounded answer generation
-- Source citation
-- Unrelated-question rejection
-- Multiple-document retrieval
-- Persistence after backend restart
-- Local Ollama integration
-
-## Configuration
-
-The main configuration is located in:
-
-```text
-app/config.py
-```
-
-Current defaults include:
-
-```text
-LLM Model:
-qwen2.5:3b
-
-Ollama:
-http://localhost:11434
-
-Embedding Model:
-sentence-transformers/all-MiniLM-L6-v2
-
-Maximum Upload Size:
-15 MB
-
-Chunk Size:
-900
-
-Chunk Overlap:
-150
-
-Top K:
-4
-
-Similarity Threshold:
-0.25
-```
-
-## Security Considerations
-
-This project is intended as a local demonstration and learning project.
-
-It should not be exposed directly to the public internet without additional security controls.
-
-The current application does not implement:
-
-- User authentication
-- Authorization
-- Per-user document isolation
-- Rate limiting
-- Malware scanning
-- Production-grade vector database security
-- Multi-user concurrency controls
-
-Do not upload sensitive or confidential documents unless you understand the risks of storing them locally.
-
-## Limitations
-
-- Scanned PDFs require OCR and may not produce usable text.
-- The vector index is JSON-based and intended for a local/single-user application.
-- Local LLM response quality depends on the selected model.
-- Retrieval quality depends on document content, chunking, embeddings, and similarity threshold.
-- RAG reduces unsupported answers but does not guarantee factual accuracy.
-- The application is designed to run locally and is not currently deployed as a public service.
-
-## Future Improvements
-
-Potential future improvements include:
-
-- OCR support for scanned documents
-- Authentication and authorization
-- Streaming LLM responses
-- Better document management
-- Conversation history
-- Metadata filtering
-- Hybrid keyword + semantic search
-- Vector database integration
-- Multi-user support
-- Docker deployment
-- Additional local LLM models
-- Automated integration testing
+## Security and limitations
+
+- This is a **local, single-user project**, not a production-ready multi-user service.
+- Run the backend bound to `127.0.0.1`; do not expose it directly to an untrusted network.
+- The application does not provide user authentication, authorization, per-user document isolation, or production-grade rate limiting.
+- Uploaded files are validated, but this project does not provide comprehensive malware scanning.
+- The local JSON/NumPy index is intended for a single application process; do not run multiple Uvicorn workers against the same data directory.
+- Retrieved passages provide traceability, not proof that an answer is correct.
+- A `grounded` response indicates that retrieved document context was used; it does not mean the generated answer has been independently fact-checked.
+- Prompt-injection handling is defensive, but no prompt-based system can guarantee immunity to malicious document content.
+
+## Future improvements
+
+- Improve retrieval quality with hybrid search and/or a reranker.
+- Add evaluation datasets and retrieval/answer-quality metrics.
+- Add stronger isolation and authentication before any network-facing deployment.
+- Add more robust document-processing limits and operational monitoring.
 
 ## License
 
-This project is intended for educational and portfolio purposes.
-
-
-## Important operational notes
-
-- Keep this application bound to `127.0.0.1` for local use. It has no authentication or multi-user isolation.
-- The JSON index is designed for a single local application process. Do not run multiple Uvicorn workers against the same data directory.
-- Back up `data/index.json` and the associated uploaded files together before changing embedding models or manually editing the index.
-- The `grounded` response field means the local LLM generated an answer using retrieved excerpts. It is not a guarantee that the answer is factually correct.
-- The distributable source package intentionally does not include your local `data/index.json`, uploaded documents, `.env`, or virtual environment. Preserve those in your existing project directory when replacing source files.
+Add a license file if you intend to distribute this project under a specific open-source license.
