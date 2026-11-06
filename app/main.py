@@ -113,8 +113,7 @@ def health():
     }
 
 
-@app.post("/documents", status_code=201)
-async def upload_document(file: UploadFile = File(...)):
+async def _index_uploaded_file(file: UploadFile):
     current_store = get_store()
 
     filename = normalize_filename(file.filename)
@@ -230,6 +229,58 @@ async def upload_document(file: UploadFile = File(...)):
 
     finally:
         await file.close()
+
+
+
+
+MAX_BATCH_FILES = 5
+
+
+@app.post("/documents", status_code=201)
+async def upload_document(file: UploadFile = File(...)):
+    """Preserve the original single-file API for existing clients."""
+    return await _index_uploaded_file(file)
+
+
+@app.post("/documents/batch")
+async def upload_documents_batch(files: list[UploadFile] = File(...)):
+    """Index at most five files independently, reporting partial failures."""
+    if not files or len(files) > MAX_BATCH_FILES:
+        for file in files:
+            await file.close()
+        raise HTTPException(400, f"Select between 1 and {MAX_BATCH_FILES} files.")
+
+    results = []
+    for file in files:
+        original_name = file.filename or "(unnamed)"
+        try:
+            result = await _index_uploaded_file(file)
+            results.append({**result, "status": "indexed"})
+        except HTTPException as exc:
+            results.append({
+                "filename": original_name,
+                "status": "duplicate" if exc.status_code == 409 else "failed",
+                "status_code": exc.status_code,
+                "error": str(exc.detail),
+            })
+        except Exception:
+            logger.exception("Unexpected error during batch upload.")
+            results.append({
+                "filename": original_name,
+                "status": "failed",
+                "status_code": 500,
+                "error": "Could not process document.",
+            })
+        finally:
+            await file.close()
+
+    successful = sum(result["status"] == "indexed" for result in results)
+    return {
+        "total": len(results),
+        "successful": successful,
+        "failed": len(results) - successful,
+        "results": results,
+    }
 
 
 @app.get("/documents")

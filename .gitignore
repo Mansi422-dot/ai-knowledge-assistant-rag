@@ -32,7 +32,6 @@ data/*
 Thumbs.db
 
 # Local backups and temporary documents
-data-backup-before-security-fixes/
 backup/
 backups/
 *.bak

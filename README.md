@@ -9,18 +9,25 @@ The application is designed to answer from the documents in its local knowledge 
 ### Main interface
 ![Main interface](screenshots/main-interface.png)
 
-### Knowledge Base 
-![Retrieved source passages for phishing](screenshots/knowledge-base.png)
+### Knowledge Base
+![Knowledge Base](screenshots/knowledge-base.png)
 
-### Retrieved sources — phishing question
-![Retrieved source passages for phishing](screenshots/retrieved-sources.png)
+### Retrieved sources
+![Retrieved source passages](screenshots/retrieved-sources.png)
 
-### Irrelevant Question
-![Retrieved source passages for phishing](screenshots/unrelated-question.png)
+### Related question
+![Related question](screenshots/related-question.png)
+
+### Upload errors
+![Upload errors](screenshots/upload-errors.png)
+
+### Irrelevant question
+![Irrelevant question](screenshots/unrelated-question.png)
 
 ## Features
 
-- Upload text-based PDF, DOCX, TXT, and Markdown documents.
+- Upload up to five text-based PDF, DOCX, TXT, and Markdown documents at once (15 MB per file), with per-file results and partial-success reporting.
+- Keep backward-compatible single-document upload API (`POST /documents`).
 - Extract and clean document text.
 - Split content into overlapping chunks.
 - Generate embeddings with Sentence Transformers.
@@ -186,8 +193,9 @@ ai-knowledge-assistant-rag/
 │   └── index.html
 ├── screenshots/
 │   ├── main-interface.png
-│   ├── grounded-answer-phishing.png
-│   └── retrieved-sources-phishing.png
+│   ├── knowledge-base.png
+│   ├── retrieved-sources.png
+│   └── unrelated-question.png
 ├── tests/
 │   ├── test_api.py
 │   ├── test_config.py
@@ -199,8 +207,17 @@ ai-knowledge-assistant-rag/
 ├── .gitignore
 ├── README.md
 ├── requirements.txt
-└── web.html
+├── networking_demo.txt
+└── rag_demo_cybersecurity.txt
 ```
+
+## Batch upload API
+
+`POST /documents/batch` accepts multipart form data with repeated `files` fields (1–5 files, up to 15 MB each). It returns HTTP 200 with `total`, `successful`, `failed`, and per-file `results` (`indexed`, `duplicate`, or `failed`). Individual failures do not prevent other files from being indexed. The existing `POST /documents` single-file endpoint remains available.
+
+## Local data and backups
+
+The ZIP release intentionally omits runtime `data/index.json` and uploaded `data/*.txt` documents. **Keep your existing `data/` folder when updating an existing installation** to preserve your knowledge base. Never replace your working `data/` folder with the empty folder from a release ZIP.
 
 ## Security and limitations
 

@@ -138,3 +138,62 @@ def test_list_documents(client):
     assert response.status_code == 200
     assert len(response.json()) == 1
     assert response.json()[0]["filename"] == "security.txt"
+
+
+def test_batch_upload_two_files(client):
+    response = client.post("/documents/batch", files=[
+        ("files", ("alpha.txt", b"Alpha security policy.", "text/plain")),
+        ("files", ("beta.md", b"# Beta\nIncident response.", "text/markdown")),
+    ])
+    assert response.status_code == 200
+    body = response.json()
+    assert (body["total"], body["successful"], body["failed"]) == (2, 2, 0)
+    assert [x["status"] for x in body["results"]] == ["indexed", "indexed"]
+    assert len(client.get("/documents").json()) == 2
+
+
+def test_batch_partial_failure_and_duplicate(client):
+    response = client.post("/documents/batch", files=[
+        ("files", ("same.txt", b"First version.", "text/plain")),
+        ("files", ("same.txt", b"Second version.", "text/plain")),
+        ("files", ("bad.exe", b"Nope.", "application/octet-stream")),
+    ])
+    assert response.status_code == 200
+    body = response.json()
+    assert (body["successful"], body["failed"]) == (1, 2)
+    assert [x["status"] for x in body["results"]] == ["indexed", "duplicate", "failed"]
+    assert (main.store.root / "same.txt").read_bytes() == b"First version."
+    assert not (main.store.root / "bad.exe").exists()
+
+
+def test_batch_rejects_more_than_five_files(client):
+    response = client.post("/documents/batch", files=[
+        ("files", (f"doc{i}.txt", b"content", "text/plain")) for i in range(6)
+    ])
+    assert response.status_code == 400
+    assert client.get("/documents").json() == []
+
+
+def test_batch_empty_file_does_not_block_valid_file(client):
+    response = client.post("/documents/batch", files=[
+        ("files", ("empty.txt", b"", "text/plain")),
+        ("files", ("valid.txt", b"Valid content.", "text/plain")),
+    ])
+    assert response.status_code == 200
+    assert response.json()["successful"] == 1
+    assert response.json()["failed"] == 1
+    assert not (main.store.root / "empty.txt").exists()
+    assert (main.store.root / "valid.txt").exists()
+
+
+def test_batch_oversize_file_does_not_block_valid_file(client, monkeypatch):
+    monkeypatch.setattr(main.settings, "max_upload_mb", 1)
+    response = client.post("/documents/batch", files=[
+        ("files", ("huge.txt", b"X" * (1024 * 1024 + 1), "text/plain")),
+        ("files", ("small.txt", b"Small valid document.", "text/plain")),
+    ])
+    assert response.status_code == 200
+    assert response.json()["successful"] == 1
+    assert response.json()["failed"] == 1
+    assert not (main.store.root / "huge.txt").exists()
+    assert (main.store.root / "small.txt").exists()
